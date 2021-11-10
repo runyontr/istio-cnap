@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: egress-gateway
+  namespace: istio-system
+  labels:
+    namespace: default
+spec:
+  selector:
+    istio: egressgateway
+  servers:
+  - hosts:
+    - "edition.cnn.com"
+    port:
+      name: tls
+      number: 443
+      protocol: TLS
+    tls:
+      mode: ISTIO_MUTUAL
+      # mode: PASSTHROUGH
+  # - hosts:
+  #   - "*.google.com"
+  #   port:
+  #     name: tls-google
+  #     number: 8443
+  #     protocol: TLS
+  #   tls:
+  #     mode: ISTIO_MUTUAL

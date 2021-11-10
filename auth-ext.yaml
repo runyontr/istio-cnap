@@ -1,0 +1,28 @@
+# apiVersion: security.istio.io/v1beta1
+# kind: AuthorizationPolicy
+# metadata:
+#   name: default-deny-egress
+#   namespace: istio-system
+# spec:
+#   selector:
+#     matchLabels:
+#         app: istio-egressgateway
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-default-sleep-cnn
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+        istio: egressgateway
+  action: ALLOW
+  rules: 
+  - from:
+      - source:
+          principals: ["cluster.local/ns/default/sa/sleep"]
+    when:
+    - key: connection.sni
+      values:
+      - "edition.cnn.com"
