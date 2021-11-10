@@ -1,0 +1,19 @@
+istio:
+  postRenderers:
+    - kustomize:
+        patchesStrategicMerge:
+        # Change operator deployment to be a rolling update
+        - kind: IstioOperator
+          apiVersion: install.istio.io/v1alpha1
+          metadata:
+            name: istiocontrolplane
+            namespace: istio-system
+          spec:
+            components:
+              egressGateways:
+              - name: istio-egressgateway
+                enabled: true
+            meshConfig:
+              outboundTrafficPolicy:
+                mode: REGISTRY_ONLY
+              

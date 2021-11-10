@@ -17,6 +17,14 @@ spec:
       protocol: TLS
     tls:
       mode: ISTIO_MUTUAL
+  - hosts:
+    - "www.google.com"
+    port:
+      name: tls-google
+      number: 8444
+      protocol: TLS
+    tls:
+      mode: ISTIO_MUTUAL
       # mode: PASSTHROUGH
   # - hosts:
   #   - "*.google.com"
