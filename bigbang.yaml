@@ -1,4 +1,6 @@
 istio:
+  git:
+    tag: 1.11.3-bb.0
   postRenderers:
     - kustomize:
         patchesStrategicMerge:
@@ -13,7 +15,18 @@ istio:
               egressGateways:
               - name: istio-egressgateway
                 enabled: true
+                k8s:
+                  service:
+                    ports:
+                    - name: http2
+                      port: 80
+                      targetPort: 8080
+                    - name: https
+                      port: 443
+                      targetPort: 8443
+                    - name: https-google
+                      port: 8444
+                      targetPort: 8444
             meshConfig:
               outboundTrafficPolicy:
                 mode: REGISTRY_ONLY
-              
