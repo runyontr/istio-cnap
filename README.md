@@ -13,6 +13,12 @@ Reference document
 - RBAC on workload traffic entering the cluster
 - RBAC on workload traffic leaving the cluster
 
+Things to look at
+
+- Geolocation of incoming IP addresses
+- SPI
+-
+
 ## Setup BigBang cluster
 
 The file `bigbang.yaml` in the repo shows how istio was patched to support an egress gateway that prevents pods in the mesh from talking to endpoints explicitly added to the mesh. For example deploy BigBang and this sleep pod for testing
@@ -231,46 +237,14 @@ spec:
             - "edition.cnn.com"
 ```
 
-### All traffic egresses from single location
+- `<1>` This `AuthorizationPolicy` applies to pods in the istio-system namespace with this label
+- `<2>` This explicitly allows the communication described in this policy.
+- `<3>` The `sleep` serviceaccount in the `default` namespace is making the request
+- `<4>` The SNI value matches `edition.cnn.com`
 
-- What is an egress gateway in Istio
+### Egress from selected Nodes
 
-- Using a service entry
-
-Somethings up with metrics. Promtheus is unable to scrape a lot of endpoints so its preventing istio metrics from being collected.
-
-- Use nodeSelectors to ensure that egress pods run on dedicated/isolated nodes
-
-https://prometheus.bigbang.dev/targets
-
-# Ingress through certain points
-
-- Istio Ingress Gateway allows for a single ingress IP address
-
--
-
-# Egress through certain points
-
-1. Turn on egress gateway
-
-2. When things are in the mesh, all traffic would egress through the istio-egress gateway, so we should use network policies to prevent talking to external services without going through the mesh: https://istio.io/latest/docs/tasks/traffic-management/egress/egress-gateway/#apply-kubernetes-network-policies
-
-# Only allow egress to certain endpoints
-
-1. Deploy istio with:
-
-```yaml
-spec:
-  components:
-    egressGateways:
-      - name: istio-egressgateway
-    enabled: true
-  meshConfig:
-    outboundTrafficPolicy:
-      mode: REGISTRY_ONLY
-```
-
-2. Ensure no egress traffic occurs by setting NetworkPolicies to prevent egress traffic:
+By egressing from a single node, or known subset of your cluster, the cluster admin is better able to restrict the permissions of the nodes running workloads. This could allow an external node group to be used for ingress and egress pods, and force the workloads to be executed on internal node groups.
 
 # require auth at the gateway
 
@@ -280,7 +254,7 @@ Thoughts:
 
 - we apply authorization policies to gateways as part of the re-work for authservice at the gateway. Perhaps we can apply authpolices for an egress gateway per namespace!
 
-# Whitelist ingress vi authorization plicy on the IngressGateway:
+# Whitelist ingress vi authorizationplicy on the IngressGateway:
 
 https://istio.io/latest/docs/tasks/security/authorization/authz-ingress/
 
@@ -302,12 +276,6 @@ spec:
         ipBlocks: ["1.2.3.4", "5.6.7.0/24"]
 EOF
 ```
-
-AUTHZ ON EGRESS GATEWAWY:
-
-Its almost in here somewhere...
-
-https://gist.github.com/yangminzhu/2123c6614825aeadba38279110450b62
 
 ## Tailscale
 
